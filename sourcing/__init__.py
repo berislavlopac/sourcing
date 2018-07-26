@@ -1,8 +1,6 @@
 import json
-from datetime import datetime, timezone
+from time import time
 from typing import Generator
-
-from ciso8601 import parse_datetime
 
 from sourcing.reactors import get_registered
 from sourcing.utils import default
@@ -10,12 +8,10 @@ from sourcing.utils import default
 
 class Event:
 
-    def __init__(self, event_type: str, data: dict, timestamp: datetime=None):
-        if timestamp is None:
-            timestamp = datetime.utcnow().astimezone(timezone.utc)
+    def __init__(self, event_type: str, data: dict, timestamp: float=None):
         self.type = event_type
         self.data = data
-        self.timestamp = timestamp
+        self.timestamp = timestamp or time()
 
     @property
     def serialized_data(self) -> str:
@@ -24,18 +20,16 @@ class Event:
     def as_dict(self):
         return {
             'type': self.type,
-            'timestamp': self.timestamp.isoformat(),
+            'timestamp': self.timestamp,
             'data': self.serialized_data
         }
 
     @classmethod
-    def from_dict(cls, serialized: dict):
-        if isinstance(serialized['timestamp'], str):
-            serialized['timestamp'] = parse_datetime(serialized['timestamp'])
+    def from_dict(cls, data: dict):
         return cls(
-            event_type=serialized['type'],
-            timestamp=serialized['timestamp'],
-            data=json.loads(serialized['data'])
+            event_type=data['type'],
+            timestamp=data['timestamp'],
+            data=json.loads(data['data'])
         )
 
 
@@ -48,7 +42,7 @@ class EventStorage:
         raise NotImplementedError
 
 
-def source_event(event_type: str, data: dict, storage: EventStorage, timestamp: datetime=None):
+def source_event(event_type: str, data: dict, storage: EventStorage, timestamp: float=None):
     event = Event(event_type, data, timestamp)
     storage.save(event)
     for reactor_class in get_registered(event_type):

@@ -1,5 +1,3 @@
-from datetime import datetime, timezone
-
 from sourcing import Event, EventStorage, source_event
 from sourcing.reactors import register, Reactor
 
@@ -36,11 +34,11 @@ def test_source_event():
     for event_type, event_data in events:
         source_event(event_type=event_type, data=event_data, storage=storage)
 
-    timestamp = datetime(1, 1, 1, tzinfo=timezone.utc)
+    timestamp = 0
     for index, event in enumerate(storage.read_events()):
         assert isinstance(event, Event)
         assert (event.type, event.data) == events[index]
-        assert event.timestamp > timestamp
+        assert event.timestamp >= timestamp
         timestamp = event.timestamp
 
     assert foo_aggregate == [

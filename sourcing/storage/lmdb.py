@@ -16,7 +16,7 @@ class LMDBEventStorage(EventStorage):
     def save(self, event: Event):
         with self.env.begin(db=self.db_name, write=True) as transaction:
             transaction.put(
-                key=str(event.timestamp.timestamp()).encode(),
+                key=str(event.timestamp).encode(),
                 value=json.dumps(event.as_dict(), default=default).encode()
             )
 

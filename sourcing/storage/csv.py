@@ -19,5 +19,6 @@ class CSVEventStorage(EventStorage):
 
     def read_events(self) -> Generator[Event, None, None]:
         with open(self.path) as csv_file:
-            for event in csv.DictReader(csv_file, fieldnames=self._fields):
-                yield Event.from_dict(event)
+            for event_data in csv.DictReader(csv_file, fieldnames=self._fields):
+                event_data['timestamp'] = float(event_data['timestamp'])
+                yield Event.from_dict(event_data)

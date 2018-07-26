@@ -1,6 +1,6 @@
 from typing import Generator
 
-from sqlalchemy import Column, String, DateTime, Text, Integer
+from sqlalchemy import Column, String, Float, Text, Integer
 from sqlalchemy.ext.declarative import declarative_base
 
 from sourcing import Event, EventStorage
@@ -11,7 +11,7 @@ Base = declarative_base()
 class EventModel(Base):
     __tablename__ = "event"
     id = Column(Integer, primary_key=True)
-    timestamp = Column(DateTime)
+    timestamp = Column(Float)
     type = Column(String(256))
     data = Column(Text)
 

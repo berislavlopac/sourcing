@@ -14,5 +14,5 @@ class TinyDBEventStorage(EventStorage):
         self.db.insert(event.as_dict())
 
     def read_events(self) -> Generator[Event, None, None]:
-        for event in self.db.all():
-            yield Event.from_dict(event)
+        for event_data in self.db.all():
+            yield Event.from_dict(event_data)

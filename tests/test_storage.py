@@ -1,3 +1,4 @@
+from itertools import zip_longest
 from pathlib import Path
 from string import ascii_lowercase
 
@@ -6,9 +7,9 @@ from pytest import fixture
 
 from sourcing import source_event
 from sourcing.storage.csv import CSVEventStorage
+from sourcing.storage.lmdb import LMDBEventStorage
 from sourcing.storage.sqlalchemy import SQLAlchemyEventStorage
 from sourcing.storage.tinydb import TinyDBEventStorage
-from sourcing.storage.lmdb import LMDBEventStorage
 
 csv_file_path = Path('./testing_file.csv')
 sqlalchemy_db_url = 'sqlite:///testing.db'
@@ -31,7 +32,9 @@ def type_and_data(draw):
 def storage_test_run(test_events, storage):
     for event_type, event_data in test_events:
         source_event(event_type=event_type, data=event_data, storage=storage)
-    assert test_events == [(e.type, e.data) for e in storage.read_events()]
+    for test, e in zip_longest(test_events, storage.read_events()):
+        assert e.type, e.data == test
+        assert isinstance(e.timestamp, float)
 
 
 @settings(max_examples=20)
