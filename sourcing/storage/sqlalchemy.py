@@ -31,5 +31,5 @@ class SQLAlchemyEventStorage(EventStorage):
         self.session.commit()
 
     def read_events(self) -> Generator[Event, None, None]:
-        for event in self.session.query(EventModel):
-            yield Event.from_serialized(vars(event))
+        for event_model in self.session.query(EventModel):
+            yield Event.from_dict(vars(event_model))

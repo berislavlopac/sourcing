@@ -17,12 +17,12 @@ class LMDBEventStorage(EventStorage):
         with self.env.begin(db=self.db_name, write=True) as transaction:
             transaction.put(
                 key=str(event.timestamp.timestamp()).encode(),
-                value=json.dumps(event.serialize(), default=default).encode()
+                value=json.dumps(event.as_dict(), default=default).encode()
             )
 
     def read_events(self) -> Generator[Event, None, None]:
         with self.env.begin(db=self.db_name) as transaction:
             yield from (
-                Event.from_serialized(json.loads(data.decode()))
+                Event.from_dict(json.loads(data.decode()))
                 for timestamp, data in transaction.cursor()
             )

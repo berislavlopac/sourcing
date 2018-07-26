@@ -21,7 +21,7 @@ class Event:
     def serialized_data(self) -> str:
         return json.dumps(self.data, default=default)
 
-    def serialize(self):
+    def as_dict(self):
         return {
             'type': self.type,
             'timestamp': self.timestamp.isoformat(),
@@ -29,7 +29,7 @@ class Event:
         }
 
     @classmethod
-    def from_serialized(cls, serialized: dict):
+    def from_dict(cls, serialized: dict):
         if isinstance(serialized['timestamp'], str):
             serialized['timestamp'] = parse_datetime(serialized['timestamp'])
         return cls(

@@ -15,9 +15,9 @@ class CSVEventStorage(EventStorage):
     def save(self, event):
         with open(self.path, 'a') as csv_file:
             writer = csv.DictWriter(csv_file, self._fields, **self._writer_specs)
-            writer.writerow(event.serialize())
+            writer.writerow(event.as_dict())
 
     def read_events(self) -> Generator[Event, None, None]:
         with open(self.path) as csv_file:
             for event in csv.DictReader(csv_file, fieldnames=self._fields):
-                yield Event.from_serialized(event)
+                yield Event.from_dict(event)
