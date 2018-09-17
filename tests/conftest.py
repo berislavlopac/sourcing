@@ -1,15 +1,15 @@
 from contextlib import contextmanager
-from shutil import rmtree
 from pathlib import Path
+from shutil import rmtree
 
-from pytest import fixture
+import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
 from sourcing.storage.sqlalchemy import Base
 
 
-@fixture(scope='function')
+@pytest.fixture
 def create_db_session(pytestconfig):
     @contextmanager
     def session_factory(db_url):
@@ -27,8 +27,8 @@ def create_db_session(pytestconfig):
     return session_factory
 
 
-@fixture(scope='function')
-def get_context_storage():
+@pytest.fixture
+def get_file_storage_context():
     @contextmanager
     def storage_factory(file_path, storage_class):
         _clear(file_path)
@@ -44,3 +44,4 @@ def _clear(path):
             rmtree(path, ignore_errors=True)
         else:
             path.unlink()
+

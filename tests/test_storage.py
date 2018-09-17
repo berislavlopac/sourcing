@@ -1,12 +1,14 @@
 from itertools import zip_longest
 from pathlib import Path
 from string import ascii_lowercase
+from unittest import mock
 
 from hypothesis import given, settings, strategies as strat
 from pytest import fixture
 
 from sourcing import source_event
 from sourcing.storage.csv import CSVEventStorage
+from sourcing.storage.kafka import KafkaEventStorage
 from sourcing.storage.lmdb import LMDBEventStorage
 from sourcing.storage.sqlalchemy import SQLAlchemyEventStorage
 from sourcing.storage.tinydb import TinyDBEventStorage
@@ -39,8 +41,8 @@ def storage_test_run(test_events, storage):
 
 @settings(max_examples=20)
 @given(strat.lists(type_and_data(), min_size=1))
-def test_csv_event_storage(get_context_storage, test_events):
-    with get_context_storage(csv_file_path, CSVEventStorage) as storage:
+def test_csv_event_storage(get_file_storage_context, test_events):
+    with get_file_storage_context(csv_file_path, CSVEventStorage) as storage:
         storage_test_run(test_events, storage)
 
 
@@ -54,13 +56,24 @@ def test_sqlalchemy_event_storage(create_db_session, test_events):
 
 @settings(max_examples=20)
 @given(strat.lists(type_and_data(), min_size=1))
-def test_tinydb_event_storage(get_context_storage, test_events):
-    with get_context_storage(tinydb_file_path, TinyDBEventStorage) as storage:
+def test_tinydb_event_storage(get_file_storage_context, test_events):
+    with get_file_storage_context(tinydb_file_path, TinyDBEventStorage) as storage:
         storage_test_run(test_events, storage)
 
 
 @settings(max_examples=20)
 @given(strat.lists(type_and_data(), min_size=1))
-def test_lmdb_event_storage(get_context_storage, test_events):
-    with get_context_storage(lmdb_file_path, LMDBEventStorage) as storage:
+def test_lmdb_event_storage(get_file_storage_context, test_events):
+    with get_file_storage_context(lmdb_file_path, LMDBEventStorage) as storage:
         storage_test_run(test_events, storage)
+
+
+@settings(max_examples=20)
+@given(strat.lists(type_and_data(), min_size=1))
+def test_kafka_event_storage(mocker, test_events):
+    events = []
+    producer = mocker.patch('sourcing.storage.kafka.KafkaProducer')
+    producer.return_value.send.side_effect = lambda topic, event, **kwargs:  events.append(event)
+    mocker.patch('sourcing.storage.kafka.KafkaConsumer', return_value=events)
+    storage = KafkaEventStorage('test_topic', mock.sentinel.bootstrap_servers)
+    storage_test_run(test_events, storage)

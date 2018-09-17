@@ -1,6 +1,5 @@
-import json
 from time import time
-from typing import Generator
+from typing import Generator, Callable
 
 from sourcing.reactors import get_registered
 from sourcing.utils import default
@@ -13,15 +12,11 @@ class Event:
         self.data = data
         self.timestamp = timestamp or time()
 
-    @property
-    def serialized_data(self) -> str:
-        return json.dumps(self.data, default=default)
-
     def as_dict(self):
         return {
             'type': self.type,
             'timestamp': self.timestamp,
-            'data': self.serialized_data
+            'data': self.data
         }
 
     @classmethod
@@ -29,7 +24,7 @@ class Event:
         return cls(
             event_type=data['type'],
             timestamp=data['timestamp'],
-            data=json.loads(data['data'])
+            data=data['data']
         )
 
 
@@ -43,7 +38,7 @@ class EventStorage:
 
 
 def source_event(event_type: str, data: dict, storage: EventStorage, timestamp: float=None):
-    event = Event(event_type, data, timestamp)
+    event = Event(event_type, data, timestamp=timestamp)
     storage.save(event)
     for reactor_class in get_registered(event_type):
         reactor_class(event).execute()

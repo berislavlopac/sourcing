@@ -8,7 +8,7 @@ class FooReactor(Reactor):
 
     def execute(self):
         if self.event.type == 'foo':
-            foo_aggregate.append(self.event.serialized_data)
+            foo_aggregate.append(self.event.data)
 
 
 class ListEventStorage(EventStorage):
@@ -23,7 +23,7 @@ class ListEventStorage(EventStorage):
         yield from self.events
 
 
-def test_source_event():
+def test_source_event_with_json_serialization():
     register(FooReactor)
     events = [
         ('foo', {'a': 'b'}),
@@ -42,6 +42,7 @@ def test_source_event():
         timestamp = event.timestamp
 
     assert foo_aggregate == [
-        '{"a": "b"}',
-        '{"d": 12.34}'
+        {"a": "b"},
+        {"d": 12.34}
     ]
+

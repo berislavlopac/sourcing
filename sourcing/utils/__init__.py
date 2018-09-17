@@ -1,5 +1,7 @@
-from datetime import date, time
-from functools import singledispatch
+from sourcing.utils.default import default
+from sourcing.utils import serialize
+
+serializer = serialize.JSON
 
 
 def get_all_subclasses(cls, inclusive=False) -> list:
@@ -7,18 +9,3 @@ def get_all_subclasses(cls, inclusive=False) -> list:
     for subclass in cls.__subclasses__():
         all_subclasses |= get_all_subclasses(subclass, inclusive=True)
     return all_subclasses
-
-
-@singledispatch
-def default(value):
-    return str(value)
-
-
-@default.register(date)
-def default_datetime(value):
-    return value.isoformat()
-
-
-@default.register(time)
-def default_datetime(value):
-    return value.isoformat()

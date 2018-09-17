@@ -1,10 +1,9 @@
-import json
 from typing import Generator
 
 import lmdb
 
 from sourcing import Event, EventStorage
-from sourcing.utils import default
+from sourcing.utils import serializer
 
 
 class LMDBEventStorage(EventStorage):
@@ -17,12 +16,12 @@ class LMDBEventStorage(EventStorage):
         with self.env.begin(db=self.db_name, write=True) as transaction:
             transaction.put(
                 key=str(event.timestamp).encode(),
-                value=json.dumps(event.as_dict(), default=default).encode()
+                value=serializer.serialize(event.as_dict()).encode()
             )
 
     def read_events(self) -> Generator[Event, None, None]:
         with self.env.begin(db=self.db_name) as transaction:
             yield from (
-                Event.from_dict(json.loads(data.decode()))
+                Event.from_dict(serializer.deserialize(data.decode()))
                 for timestamp, data in transaction.cursor()
             )
