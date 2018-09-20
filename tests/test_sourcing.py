@@ -32,7 +32,7 @@ def test_source_event_with_json_serialization():
     ]
     storage = ListEventStorage()
     for event_type, event_data in events:
-        source_event(event_type=event_type, data=event_data, storage=storage)
+        source_event(storage=storage, event_type=event_type, data=event_data)
 
     timestamp = 0
     for index, event in enumerate(storage.read_events()):

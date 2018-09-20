@@ -33,7 +33,7 @@ def type_and_data(draw):
 @fixture
 def storage_test_run(test_events, storage):
     for event_type, event_data in test_events:
-        source_event(event_type=event_type, data=event_data, storage=storage)
+        source_event(storage=storage, event_type=event_type, data=event_data)
     for test, e in zip_longest(test_events, storage.read_events()):
         assert e.type, e.data == test
         assert isinstance(e.timestamp, float)

@@ -37,7 +37,7 @@ class EventStorage:
         raise NotImplementedError
 
 
-def source_event(event_type: str, data: dict, storage: EventStorage, timestamp: float=None):
+def source_event(storage: EventStorage, event_type: str, data: dict, timestamp: float = None):
     event = Event(event_type, data, timestamp=timestamp)
     storage.save(event)
     for reactor_class in get_registered(event_type):
