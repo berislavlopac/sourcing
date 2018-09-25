@@ -19,7 +19,7 @@ setup(
     ],
     install_requires=[
         "sqlalchemy~=1.2",
-        "tinydb~=3.9",
+        "tinydb~=3.11",
         "lmdb~=0.94",
         "msgpack~=0.5",
         "kafka-python~=1.4",

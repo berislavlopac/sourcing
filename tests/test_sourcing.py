@@ -23,7 +23,7 @@ class ListEventStorage(EventStorage):
         yield from self.events
 
 
-def test_source_event_with_json_serialization():
+def test_sourcing_and_reacting_with_json_serialization():
     register(FooReactor)
     events = [
         ('foo', {'a': 'b'}),
@@ -32,7 +32,8 @@ def test_source_event_with_json_serialization():
     ]
     storage = ListEventStorage()
     for event_type, event_data in events:
-        source_event(storage=storage, event_type=event_type, data=event_data)
+        event = source_event(storage=storage, event_type=event_type, data=event_data)
+        event.react()
 
     timestamp = 0
     for index, event in enumerate(storage.read_events()):

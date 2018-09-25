@@ -4,7 +4,6 @@ from string import ascii_lowercase
 from unittest import mock
 
 from hypothesis import given, settings, strategies as strat
-from pytest import fixture
 
 from sourcing import source_event
 from sourcing.storage.csv import CSVEventStorage
@@ -12,6 +11,8 @@ from sourcing.storage.kafka import KafkaEventStorage
 from sourcing.storage.lmdb import LMDBEventStorage
 from sourcing.storage.sqlalchemy import SQLAlchemyEventStorage
 from sourcing.storage.tinydb import TinyDBEventStorage
+
+MAX_EXAMPLES = 20
 
 csv_file_path = Path('./testing_file.csv')
 sqlalchemy_db_url = 'sqlite:///testing.db'
@@ -30,7 +31,6 @@ def type_and_data(draw):
     return event_type, data
 
 
-@fixture
 def storage_test_run(test_events, storage):
     for event_type, event_data in test_events:
         source_event(storage=storage, event_type=event_type, data=event_data)
@@ -39,14 +39,14 @@ def storage_test_run(test_events, storage):
         assert isinstance(e.timestamp, float)
 
 
-@settings(max_examples=20)
+@settings(max_examples=MAX_EXAMPLES)
 @given(strat.lists(type_and_data(), min_size=1))
 def test_csv_event_storage(get_file_storage_context, test_events):
     with get_file_storage_context(csv_file_path, CSVEventStorage) as storage:
         storage_test_run(test_events, storage)
 
 
-@settings(max_examples=20)
+@settings(max_examples=MAX_EXAMPLES)
 @given(strat.lists(type_and_data(), min_size=1))
 def test_sqlalchemy_event_storage(create_db_session, test_events):
     with create_db_session(sqlalchemy_db_url) as db_session:
@@ -54,21 +54,21 @@ def test_sqlalchemy_event_storage(create_db_session, test_events):
         storage_test_run(test_events, storage)
 
 
-@settings(max_examples=20)
+@settings(max_examples=MAX_EXAMPLES)
 @given(strat.lists(type_and_data(), min_size=1))
 def test_tinydb_event_storage(get_file_storage_context, test_events):
     with get_file_storage_context(tinydb_file_path, TinyDBEventStorage) as storage:
         storage_test_run(test_events, storage)
 
 
-@settings(max_examples=20)
+@settings(max_examples=MAX_EXAMPLES)
 @given(strat.lists(type_and_data(), min_size=1))
 def test_lmdb_event_storage(get_file_storage_context, test_events):
     with get_file_storage_context(lmdb_file_path, LMDBEventStorage) as storage:
         storage_test_run(test_events, storage)
 
 
-@settings(max_examples=20)
+@settings(max_examples=MAX_EXAMPLES)
 @given(strat.lists(type_and_data(), min_size=1))
 def test_kafka_event_storage(mocker, test_events):
     events = []

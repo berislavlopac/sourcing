@@ -1,5 +1,5 @@
 from time import time
-from typing import Generator, Callable
+from typing import Generator
 
 from sourcing.reactors import get_registered
 from sourcing.utils import default
@@ -27,6 +27,10 @@ class Event:
             data=data['data']
         )
 
+    def react(self):
+        for reactor_class in get_registered(self.type):
+            reactor_class(self).execute()
+
 
 class EventStorage:
 
@@ -40,5 +44,4 @@ class EventStorage:
 def source_event(storage: EventStorage, event_type: str, data: dict, timestamp: float = None):
     event = Event(event_type, data, timestamp=timestamp)
     storage.save(event)
-    for reactor_class in get_registered(event_type):
-        reactor_class(event).execute()
+    return event
