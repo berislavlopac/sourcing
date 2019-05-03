@@ -30,17 +30,17 @@ def test_sourcing_and_reacting_with_json_serialization():
         ('bar', {1: 'c'}),
         ('foo', {'d': 12.34})
     ]
-    storage = ListEventStorage()
-    for event_type, event_data in events:
-        event = source_event(storage=storage, event_type=event_type, data=event_data)
-        event.react()
+    with ListEventStorage() as storage:
+        for event_type, event_data in events:
+            event = source_event(storage=storage, event_type=event_type, data=event_data)
+            event.react()
 
-    timestamp = 0
-    for index, event in enumerate(storage.read_events()):
-        assert isinstance(event, Event)
-        assert (event.type, event.data) == events[index]
-        assert event.timestamp >= timestamp
-        timestamp = event.timestamp
+        timestamp = 0
+        for index, event in enumerate(storage.read_events()):
+            assert isinstance(event, Event)
+            assert (event.type, event.data) == events[index]
+            assert event.timestamp >= timestamp
+            timestamp = event.timestamp
 
     assert foo_aggregate == [
         {"a": "b"},

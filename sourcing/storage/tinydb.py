@@ -6,7 +6,6 @@ from sourcing import Event, EventStorage
 
 
 class TinyDBEventStorage(EventStorage):
-
     def __init__(self, path):
         self.db = TinyDB(path)
 

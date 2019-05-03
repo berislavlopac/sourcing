@@ -18,12 +18,11 @@ class EventModel(Base):
 
     def as_dict(self):
         data = vars(self)
-        data['data'] = serializer.deserialize(self.data)
+        data["data"] = serializer.deserialize(self.data)
         return data
 
 
 class SQLAlchemyEventStorage(EventStorage):
-
     def __init__(self, db_session):
         self.session = db_session
 
@@ -31,7 +30,7 @@ class SQLAlchemyEventStorage(EventStorage):
         event_instance = EventModel(
             timestamp=event.timestamp,
             type=event.type,
-            data=serializer.serialize(event.data)
+            data=serializer.serialize(event.data),
         )
         self.session.add(event_instance)
         self.session.commit()

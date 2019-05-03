@@ -7,13 +7,11 @@ from sourcing.utils import serializer
 
 
 class KafkaEventStorage(EventStorage):
-
     def __init__(self, topic, bootstrap_servers):
         self.topic = topic
         self.bootstrap_servers = bootstrap_servers
         self.producer = KafkaProducer(
-            bootstrap_servers=bootstrap_servers,
-            value_serializer=serializer.serialize
+            bootstrap_servers=bootstrap_servers, value_serializer=serializer.serialize
         )
 
     def save(self, event):
@@ -23,5 +21,5 @@ class KafkaEventStorage(EventStorage):
         yield from KafkaConsumer(
             self.topic,
             bootstrap_servers=self.bootstrap_servers,
-            value_deserializer=serializer.deserialize
+            value_deserializer=serializer.deserialize,
         )

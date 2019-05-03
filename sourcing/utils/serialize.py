@@ -6,7 +6,6 @@ from sourcing.utils.default import default
 
 
 class MsgPack:
-
     @staticmethod
     def deserialize(value):
         if not isinstance(value, bytes):
@@ -19,7 +18,6 @@ class MsgPack:
 
 
 class JSON:
-
     @staticmethod
     def deserialize(value):
         return json.loads(value)
@@ -27,5 +25,3 @@ class JSON:
     @staticmethod
     def serialize(value):
         return json.dumps(value, default=default)
-
-
